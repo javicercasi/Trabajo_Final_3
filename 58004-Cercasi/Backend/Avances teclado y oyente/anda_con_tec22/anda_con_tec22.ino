@@ -96,16 +96,24 @@ void oyente(){
 
    String numero2 = s.separa(data, '"', 1);
    
-   Serial.println("Estadooo: "+first+" Numerazo: "+numero2+"leng:"+(String(first)).length());
-   if (numero2.length() > 10 && i == 0){
+   Serial.println("Estado: "+first+" i="+i+" j="+j+" Numero: "+numero2+" leng: "+(String(first)).length());
+   
+   if (first.toInt() == 0){
+      i = 0;
+      j = 0;
+      numero2 = "";}
+      
+   if (numero2.length() == 13 && i == 0){
       i++;    //Aca debo detectar el ata
-      if (numero2.length() > 5 ){Serial.println("Llamada de: "+numero2);
-      while (tecla != '*'){
+      Serial.println("Llamada de: "+numero2);
+      while (tecla != '*' && tecla != '#'){
                 tecla = keypad.getKey();
                 if (tecla == '*') {
-                  Serial1.println("ATA");
-                  j = 0;}}
-      }}
+                  Serial1.println("ATA");}
+                  
+                 if (tecla == '#') {
+                  Serial1.println("ATH");}}
+      }
 
    if (first.toInt() == 4){
     j++;
@@ -113,13 +121,9 @@ void oyente(){
     while (tecla != '#'){
                 tecla = keypad.getKey();
                 if (tecla == '#') {
-                  Serial1.println("ATH");
-                  i = 0;}}}
-  } 
-  Serial.println("Variable i: "+String(i)+" Variable j: "+String(j)+"LENnum: "+numero2.length());
+                  Serial1.println("ATH");}}}
+                          } 
   }
-
-
 
 
 //AT+CPAS, SI ES 3, ESTA SONANDO
@@ -128,10 +132,10 @@ void oyente(){
 //AT+CPBF VER TODOS LOS CONTACTOS
 void loop(){  
 
-   //oyente();
+   oyente();
    //ShowSerialData();
 
-   teclado();
+   //teclado();
         
         }
 
