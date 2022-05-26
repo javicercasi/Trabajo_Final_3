@@ -7,6 +7,7 @@ unsigned long previo, actual, a;
 unsigned long tiempo;
 const byte rowsCount = 4;
 const byte columsCount = 4;
+String apikey = "";
  
 char keys[rowsCount][columsCount] = {
    { '1','2','3', 'A' },
@@ -132,10 +133,10 @@ void oyente(){
 //AT+CPBF VER TODOS LOS CONTACTOS
 void loop(){  
 
-   oyente();
+   //oyente();
    //ShowSerialData();
 
-   //teclado();
+   teclado();
         
         }
 
@@ -144,9 +145,31 @@ void teclado(){
      char key = keypad.getKey();
  
    if (key) {
-      if (key == '*'){
+
+    if (key == '0'){
+              Serial.println("Nube:");
+              Serial.println("Ingrese al apikey Vista en el Servidor");
+              //String apikey = "";
+              boolean a = true;
+              char tecla = keypad.getKey();
+              while (tecla != '#'){
+                tecla = keypad.getKey();
+                if ((tecla != NO_KEY) && (tecla != '#') && (tecla != '*')) {
+                  apikey.concat(tecla);
+                  Serial.println();
+                  Serial.write(tecla);
+                  }}
+              int b = apikey.length();
+              Serial.println("Numero: "+ apikey +"    Extension teclas: "+ String(b));
+              if (b > 0){
+              Serial.println();
+              Serial.println("Su apikey es: "+apikey);}
+      }
+    
+    if (key == '*'){
         Serial1.println("ATA");}
-      if (key == '#'){
+    
+    if (key == '#'){
         Serial1.println("ATH");
         Serial.println("Fin de Llamada");
         i = 0;
