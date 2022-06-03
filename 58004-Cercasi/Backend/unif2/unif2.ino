@@ -1,9 +1,12 @@
 #include <Keypad.h>
+#include <LiquidCrystal.h>
 #include <Separador.h> 
 #include <String.h>
+LiquidCrystal lcd(2, 3, 4, 5, 6, 7);
+
 int i=0, j=0;
 Separador s;
-unsigned long previo, actual, a;
+unsigned long previo, actual, a, duracion;
 unsigned long tiempo;
 const byte rowsCount = 4;
 const byte columsCount = 4;
@@ -28,10 +31,23 @@ Keypad keypad = Keypad(makeKeymap(keys), rowPins, columnPins, rowsCount, columsC
   Serial1.begin(9600);               
   Serial.begin(9600);                
   Serial.println("Start!...");
+  lcd.begin(16, 2);
   comando("AT", 2000);
   Configuracion();
   delay(2000);
+  standby();
+  
  }
+
+void standby(){
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("   Bienvenido");
+  lcd.setCursor(0, 1);
+  lcd.print("Telefono Arduino");
+  }
+
+void (* reset) (void) = 0;
 
 void ShowSerialData(){
   
@@ -90,7 +106,6 @@ void oyente(){
   String data = "";
   Serial1.println("AT+CPAS");
   delay(1300);
-  //Serial.println("Entreeeeee");
     while (Serial1.available())
    {
       char character = Serial1.read();
@@ -100,13 +115,11 @@ void oyente(){
       }
    }
 
-  teclado();
-
+   teclado();
    String numero = s.separa(data, ':', 1);
    byte prevPos = numero.indexOf('O');                       // Buscar la posición de la primera coma en la cadena
    String first = numero.substring(0, prevPos);
    String numero2 = s.separa(data, '"', 1);
-   //Serial.println("Estado: "+first+" i="+i+" j="+j+" Numero: "+numero2+" leng: "+(String(numero2)).length());
    
    if (numero2.length() == 0){
       i = 0;
@@ -116,24 +129,32 @@ void oyente(){
    if (numero2.length() == 13 && i == 0){
       char tecla = keypad.getKey();
       i++;    //Aca debo detectar el ata
-      Serial.println("Llamada de: "+numero2);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Llamada Entrante:");
+      lcd.setCursor(0, 1);
+      lcd.print(numero2);
+
+      //Serial.println("Llamada de: "+numero2);
+      
       while (tecla != '*' && tecla != '#'){
                 tecla = keypad.getKey();
                 if (tecla == '*') {
-                  Serial1.println("ATA");}
+                  Serial1.println("ATA");
+                  timmer();
+                                  }
                   
                  if (tecla == '#') {
-                  Serial1.println("ATH");}}
+                  Serial1.println("ATH");
+                  lcd.clear();
+                  lcd.setCursor(0, 0);
+                  lcd.print("    Llamada    ");
+                  lcd.setCursor(0, 1);
+                  lcd.print("   Rechazada   ");
+                  delay(4500);
+                  standby();
+    }}
       }
-
-   if (i == 1){
-    i = 0;
-    char tecla = keypad.getKey();
-    Serial.println("Llamada en curso");
-    while (tecla != '#'){
-                tecla = keypad.getKey();
-                if (tecla == '#') {
-                  Serial1.println("ATH");}}}
                           
   }
 
@@ -152,6 +173,32 @@ void oyente(){
         oyente();}
         
               }
+void timmer()
+  {
+  boolean a = true;
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Llamada:");
+  previo = millis()/1000;
+  Serial.print( "Pase" );
+  while (a){
+    char key = keypad.getKey();
+    lcd.setCursor(0, 1);
+    lcd.print(String(millis()/1000 - previo) + " Segundos");
+    delay(100);
+    if (key == '#'){
+        Serial1.println("ATH");
+        a = false;
+        duracion = millis()/1000 - previo;
+        lcd.clear();
+        lcd.print("Fin de Llamada");
+        lcd.setCursor(0, 1);
+        lcd.print("Duracion: " + String(duracion) + " s.");
+        delay(4500);
+        standby();
+        }
+  }
+}
 
 void teclado(){
 
@@ -182,6 +229,10 @@ void teclado(){
     if (key == '*'){
         Serial.println("Encendido de Modulo");
         encendido();}
+    
+    if (key == 'A'){
+        Serial.println("Reseteado del Modulo");
+        reset();}
 
     if (key == '#'){
         Serial.println("Fin llamada");}
