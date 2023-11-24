@@ -23,10 +23,10 @@ void Configuracion(){
   comando("AT+CLIP=1", 500);    //Identificador de llamda activado
   comando("AT+IFC=1,1", 500);   //Retorno de datos por Soft
   //comando("AT+CPBF", 4000); 
-  //comando("AT+CMIC=0,7", 500);  //Ganancia microfono 0-15
-  //comando("AT+CALS=4", 500);    //Tono seleccionado 0-19
-  //comando("AT+CLVL=80", 500);   //Volumen parlante 0-100
-  //comando("AT+CRSL=1", 500);    //Volumen Llamada 0-4
+  comando("AT+CMIC=0,7", 500);  //Ganancia microfono 0-15
+  comando("AT+CALS=4", 500);    //Tono seleccionado 0-19
+  comando("AT+CLVL=70", 500);   //Volumen parlante 0-100
+  comando("AT+CRSL=1", 500);    //Volumen Llamada 0-4
 }
 
 
@@ -71,8 +71,8 @@ void encendido(){
   if (posicion.toInt() > 7){
     posicion = "8";}
 
-  comando("AT+CIPSTATUS", 2000);
-  comando("AT+CIPMUX=0", 2000);
+  comando("AT+CIPSTATUS", 3000);
+  comando("AT+CIPMUX=0", 2500);
   comando("AT+CSTT=\"datos.personal.com\",\"datos\",\"datos\"", 1000);
   comando("AT+CIICR", 3000);
   comando("AT+CIFSR", 2000);
@@ -115,8 +115,11 @@ void timmer(String posicion)
         lcd.setCursor(0, 1);
         lcd.print("Duracion: " + String(duracion) + " s.");
         delay(4500);
+        lcd.clear();
+        lcd.print(" Enviando Datos");
+        delay(3500);
         standby();
-        //envio_trama(posicion, String(duracion));
+        envio_trama(posicion, String(duracion));
         }
   }
 }
